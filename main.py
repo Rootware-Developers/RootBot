@@ -15,12 +15,14 @@ bot = commands.Bot(command_prefix="!", intents=intents)
 cogs_list = [
     "JoinRoles"
 ]
-for cog in cogs_list:
-    bot.load_extension(f'cogs.{cog}')
+async def load_cogs():
+    for cog in cogs_list:
+        await bot.load_extension(f'cogs.{cog}')
 
 
 @bot.event
 async def on_ready():
+    await load_cogs()
     print(f'Bot started succesfully!')
     try:
         synced = await bot.tree.sync()
