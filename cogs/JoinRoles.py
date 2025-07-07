@@ -110,4 +110,6 @@ class JoinRoles(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(JoinRoles(bot))
+    cog = JoinRoles(bot)
+    bot.add_cog(cog)
+    bot.tree.add_command(cog.join_roles)
