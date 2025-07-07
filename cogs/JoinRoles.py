@@ -2,13 +2,14 @@ import discord
 import json
 import os
 from discord.ext import commands
+from discord.commands import SlashCommandGroup
 
 
 class JoinRoles(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
-        self.join_roles = {}
+        self.join_roles_data = {}
         self.file = "join_roles.json"
         self.load_roles()
         self.bot.tree.add_command(self.join_roles)
@@ -17,30 +18,30 @@ class JoinRoles(commands.Cog):
     def load_roles(self):
         if os.path.isfile(self.file):
             with open(self.file, "r") as f:
-                self.join_roles = json.load(f)
+                self.join_roles_data = json.load(f)
         else:
-            self.join_roles = {}
+            self.join_roles_data = {}
 
     def save_roles(self):
         with open(self.file, "w") as f:
-            json.dump(self.join_roles, f)
+            json.dump(self.join_roles_data, f)
 
 
 
-    join_roles = discord.SlashCommandGroup("join_roles", "Manage join roles")
+    join_roles = SlashCommandGroup("join_roles", "Manage join roles")
 
     @join_roles.command(name="add", description="Add a role to be assigned to a user on join")
     @commands.has_permissions(administrator=True)
     async def add(self, ctx, role: discord.Role):
         guild_id = str(ctx.guild.id)
-        if guild_id not in self.join_roles:
+        if guild_id not in self.join_roles_data:
             self.join_roles[guild_id] = []
 
-        if role.id in self.join_roles[guild_id]:
+        if role.id in self.join_roles_data[guild_id]:
             await ctx.respond(f"{role.mention} has already been added.", ephemeral=True)
             return
         
-        self.join_roles[guild_id].append(role.id)
+        self.join_roles_data[guild_id].append(role.id)
         self.save_roles()
         await ctx.respond(f"{role.mention} is now awarded upon joining.", ephemeral=True)
 
@@ -48,23 +49,23 @@ class JoinRoles(commands.Cog):
     @commands.has_permissions(administrator=True)
     async def remove(self, ctx, role: discord.Role):
         guild_id = str(ctx.guild.id)
-        if guild_id not in self.join_roles or role.id not in self.join_roles[guild_id]:
+        if guild_id not in self.join_roles_data or role.id not in self.join_roles_data[guild_id]:
             await ctx.respond(f"{role.mention} is not saved as join role.", ephemeral=True)
             return
         
-        self.join_roles[guild_id].remove(role.id)
+        self.join_roles_data[guild_id].remove(role.id)
         self.save_roles()
         await ctx.respond(f"{role.mention} is no longer awarded upon entry", ephemeral=True)
 
     @join_roles.command(name="list", description="List all roles assigned on join")
     async def list(self, ctx):
         guild_id = str(ctx.guild.id)
-        if guild_id not in self.join_roles or len(self.join_roles[guild_id]) == 0:
+        if guild_id not in self.join_roles_data or len(self.join_roles_data[guild_id]) == 0:
             await ctx.respond("You have hot defined any join roles", ephemeral=True)
             return
         
         roles = []
-        for role_id in self.join_roles[guild_id]:
+        for role_id in self.join_roles_data[guild_id]:
             role = ctx.guild.get_role(role_id)
             if role:
                 roles.append(role.mention)
@@ -82,10 +83,10 @@ class JoinRoles(commands.Cog):
     @commands.Cog.listener()
     async def on_member_join(self, member):
         guild_id = str(member.guild.id)
-        if guild_id not in self.join_roles:
+        if guild_id not in self.join_roles_data:
             return
         
-        roles_ids = self.join_roles[guild_id]
+        roles_ids = self.join_roles_data[guild_id]
         roles_to_add = []
 
         for role_id in roles_ids:
