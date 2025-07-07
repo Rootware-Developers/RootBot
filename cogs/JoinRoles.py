@@ -28,7 +28,7 @@ class JoinRoles(commands.Cog):
 
     join_roles = discord.SlashCommandGroup("join_roles", "Manage join roles")
 
-    @join_roles.command(name="add", description="Add a role to be assigned to a user on join")
+    @discord.slash_command(name="add", description="Add a role to be assigned to a user on join")
     @commands.has_permissions(administrator=True)
     async def add(self, ctx, role: discord.Role):
         guild_id = str(ctx.guild.id)
