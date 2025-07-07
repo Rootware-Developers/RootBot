@@ -11,6 +11,7 @@ class JoinRoles(commands.Cog):
         self.join_roles = {}
         self.file = "join_roles.json"
         self.load_roles()
+        self.bot.tree.add_command(self.join_roles)
     
 
     def load_roles(self):
