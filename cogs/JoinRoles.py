@@ -11,8 +11,8 @@ class JoinRoles(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
-        self.join_roles = {}
         self.file = "join_roles.json"
+        self.join_roles_data = {}
         self.load_roles()
     
     async def setup(bot: commands.Bot):
