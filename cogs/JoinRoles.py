@@ -2,6 +2,7 @@ import discord
 import json
 import os
 from discord.ext import commands
+from discord.commands import SlashCommandGroup
 
 
 class JoinRoles(commands.Cog):
