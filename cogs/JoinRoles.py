@@ -7,15 +7,20 @@ from discord.commands import SlashCommandGroup
 
 class JoinRoles(commands.Cog):
 
+    join_roles = SlashCommandGroup("join_roles", "Manage join roles")
+
     def __init__(self, bot):
         self.bot = bot
         self.join_roles = {}
         self.file = "join_roles.json"
         self.load_roles()
-
-    async def cog_load(self):
-        self.bot.tree.add_command(self.join_roles)
     
+    async def setup(bot: commands.Bot):
+        cog = JoinRoles(bot)
+        await bot.add_cog(cog)
+        # Slash-Group registrieren
+        bot.tree.add_command(cog.join_roles)
+
 
     def load_roles(self):
         if os.path.isfile(self.file):
