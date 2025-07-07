@@ -59,6 +59,7 @@ class JoinRoles(commands.Cog):
 
     @join_roles.command(name="list", description="List all roles assigned on join")
     async def list(self, ctx):
+        
         guild_id = str(ctx.guild.id)
         if guild_id not in self.join_roles_data or len(self.join_roles_data[guild_id]) == 0:
             await ctx.response.send_message("You have hot defined any join roles", ephemeral=True)
