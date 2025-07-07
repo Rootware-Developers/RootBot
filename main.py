@@ -23,7 +23,7 @@ for cog in cogs_list:
 async def on_ready():
     print(f'Bot started succesfully!')
     try:
-        synced = await bot.tee.sync()
+        synced = await bot.tree.sync()
         print(f"✅ {len(synced)} Slash-Commands synced: {[cmd.name for cmd in synced]}")
     except Exception as e:
         print(f"Error on Sync: {e}")
