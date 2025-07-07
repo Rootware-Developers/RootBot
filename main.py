@@ -15,18 +15,17 @@ bot = commands.Bot(command_prefix="!", intents=intents)
 cogs_list = [
     "JoinRoles"
 ]
-
-
-@bot.event
-async def setup_hook():
-    for cog in cogs_list:
-        await bot.load_extension(f"cogs.{cog}")
-    synced = await bot.tree.sync()
-    print(f"✅ {len(synced)} Slash-Commands synced: {[cmd.name for cmd in synced]}")
+for cog in cogs_list:
+    bot.load_extension(f'cogs.{cog}')
 
 
 @bot.event
 async def on_ready():
     print(f'Bot started succesfully!')
+    try:
+        synced = await bot.tree.sync()
+        print(f"✅ {len(synced)} Slash-Commands synced: {[cmd.name for cmd in synced]}")
+    except Exception as e:
+        print(f"Error on Sync: {e}")
 
 bot.run(os.getenv("TOKEN"))
