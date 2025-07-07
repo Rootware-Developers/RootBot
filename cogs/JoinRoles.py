@@ -2,7 +2,6 @@ import discord
 import json
 import os
 from discord.ext import commands
-from discord.commands import SlashCommandGroup
 
 
 class JoinRoles(commands.Cog):
@@ -27,9 +26,9 @@ class JoinRoles(commands.Cog):
 
 
 
-    join_roles_group = SlashCommandGroup("join_roles", "Manage join roles")
+    join_roles = discord.SlashCommandGroup("join_roles", "Manage join roles")
 
-    @join_roles_group.command(name="add", description="Add a role to be assigned to a user on join")
+    @join_roles.command(name="add", description="Add a role to be assigned to a user on join")
     @commands.has_permissions(administrator=True)
     async def add(self, ctx, role: discord.Role):
         guild_id = str(ctx.guild.id)
@@ -44,7 +43,7 @@ class JoinRoles(commands.Cog):
         self.save_roles()
         await ctx.respond(f"{role.mention} is now awarded upon joining.", ephemeral=True)
 
-    @join_roles_group.command(name="remove", description="Remove a role from the join roles")
+    @join_roles.command(name="remove", description="Remove a role from the join roles")
     @commands.has_permissions(administrator=True)
     async def remove(self, ctx, role: discord.Role):
         guild_id = str(ctx.guild.id)
@@ -56,7 +55,7 @@ class JoinRoles(commands.Cog):
         self.save_roles()
         await ctx.respond(f"{role.mention} is no longer awarded upon entry", ephemeral=True)
 
-    @join_roles_group.command(name="list", description="List all roles assigned on join")
+    @join_roles.command(name="list", description="List all roles assigned on join")
     async def list(self, ctx):
         guild_id = str(ctx.guild.id)
         if guild_id not in self.join_roles or len(self.join_roles[guild_id]) == 0:
