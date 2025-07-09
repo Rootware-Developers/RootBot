@@ -22,6 +22,7 @@ class JoinRoles(commands.Cog):
         with open(self.file, "w") as f:
             json.dump(self.join_roles, f)
 
+
     @commands.Cog.listener()
     async def on_ready(self):
         try:
@@ -29,6 +30,7 @@ class JoinRoles(commands.Cog):
             print("Slash-Commands synced in JoinRoles Cog")
         except Exception as e:
             print(f"Error syncing JoinRoles commands: {e}")
+
 
     @commands.Cog.listener()
     async def on_member_join(self, member: discord.Member):
@@ -43,6 +45,7 @@ class JoinRoles(commands.Cog):
                 await member.add_roles(*roles, reason="Join roles assignment")
             except Exception as e:
                 print(f"Error assigning join roles: {e}")
+
 
 
    
