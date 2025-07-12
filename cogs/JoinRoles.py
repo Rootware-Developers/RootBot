@@ -65,6 +65,7 @@ class JoinRoles(commands.Cog):
     @joinroles.command(name="remove", description="Remove a role from the join list")
     @commands.has_permissions(administrator=True)
     async def remove(self, ctx: discord.ApplicationContext, role: discord.Role):
+        
         guild_id = str(ctx.guild.id)
         if guild_id not in self.join_roles or role.id not in self.join_roles[guild_id]:
             await ctx.response.send_message(f"{role.mention} is not a join role.", ephemeral=True)
