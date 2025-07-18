@@ -13,8 +13,7 @@ intents.members = True
 bot = commands.Bot(command_prefix="!", intents=intents)
 
 cogs_list = [
-    "JoinRoles",
-    "container"
+    "OnJoin"
 ]
 
 @bot.event
