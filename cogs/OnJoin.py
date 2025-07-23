@@ -33,8 +33,8 @@ class JoinRoles(commands.Cog):
 
         view = View(container, timeout=None)
         channel = self.bot.get_channel(JOIN_CHANNEL)
-        await member.add_roles(*roles, reason="Autorole")
         await channel.send(view=view)
+        await member.add_roles(*roles, reason="Autorole")
         
 
 
