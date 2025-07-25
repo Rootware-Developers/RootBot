@@ -129,7 +129,7 @@ class Warning(commands.Cog):
             f"> **<:case:1397981208763433112>Case:** `#{CASE}`"
         )
         LOGS_CONTAINER.add_separator()
-        LOGS_CONTAINER.add_text(f"-# {datetime.now().strftime("%b %d, %Y %I:%M %p")}")
+        LOGS_CONTAINER.add_text(f"-# {datetime.now().strftime('%b %d, %Y %I:%M %p')}")
         LOG_VIEW = View(LOGS_CONTAINER, timeout=None)
 
 
