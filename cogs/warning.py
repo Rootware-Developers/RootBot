@@ -162,7 +162,7 @@ class Warning(commands.Cog):
         
 
         # > USER CONTAINER <
-        USER_CONTAINER.add_text("# <:warn:1397873177283264594> 〢 You got unwarned ")
+        USER_CONTAINER.add_text("# <:check:1398300987059343431> You got unwarned ")
         USER_CONTAINER.add_separator()
         USER_CONTAINER.add_text(
             f"> **<:reason:1397984129928265902>Reason:** `{reason}`\n"  
@@ -174,7 +174,7 @@ class Warning(commands.Cog):
 
 
         # > LOG CONTAINER <
-        LOGS_CONTAINER.add_text("# <:warn:1397873177283264594> 〢 User got unwarned ")
+        LOGS_CONTAINER.add_text("# <:check:1398300987059343431> User got unwarned ")
         LOGS_CONTAINER.add_separator()
         LOGS_CONTAINER.add_text(
             f"> **<:user:1397981170431688844>User:** <@{USER_ID}>\n" 
