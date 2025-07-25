@@ -169,7 +169,7 @@ class Warning(commands.Cog):
             f"> **<:moderator:1397981211640598719>Moderator: {MODERATOR.mention}**"
         )
         USER_CONTAINER.add_separator()
-        USER_CONTAINER.add_text(f"-# {datetime.now().strftime("%b %d, %Y %I:%M %p")}")
+        USER_CONTAINER.add_text(f"-# {datetime.now().strftime('%b %d, %Y %I:%M %p')}")
         USER_VIEW = View(USER_CONTAINER, timeout=None)
 
 
@@ -182,7 +182,7 @@ class Warning(commands.Cog):
             f"> **<:moderator:1397981211640598719>Moderator: {MODERATOR.mention}**"
         )
         LOGS_CONTAINER.add_separator()
-        LOGS_CONTAINER.add_text(f"-# {datetime.now().strftime("%b %d, %Y %I:%M %p")}")
+        LOGS_CONTAINER.add_text(f"-# {datetime.now().strftime('%b %d, %Y %I:%M %p')}")
         LOG_VIEW = View(LOGS_CONTAINER, timeout=None)
 
 
