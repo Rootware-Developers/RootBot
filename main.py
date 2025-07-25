@@ -14,7 +14,8 @@ bot = commands.Bot(command_prefix="!", intents=intents)
 
 cogs_list = [
     "OnJoin",
-    "rules"
+    "rules",
+    "warning"
 ]
 
 @bot.event
@@ -28,3 +29,9 @@ async def main():
         await bot.start(os.getenv("TOKEN"))
 
 asyncio.run(main())
+
+
+
+# MODERATOR_PERMS = mute, view_user
+# MODERATOR_STAGE2_PERMS = kick, view_staffmember
+# ADMINISTRATOR_PERMS = ban, warn_staffmember, kick_staffmember, add_staffmember, rank_staffmember
