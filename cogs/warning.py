@@ -197,6 +197,3 @@ class Warning(commands.Cog):
 
 def setup(bot):
     bot.add_cog(Warning(bot))
-
-
-# EMOJI CHANGES: user -> person, reason -> paper, warn -> warning, case -> wallet
