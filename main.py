@@ -3,6 +3,7 @@ import os
 from discord.ext import commands
 from dotenv import load_dotenv
 import asyncio
+from cogs.appeals import load_appeal_buttons, AppealPersistentView
 
 load_dotenv()
 
@@ -15,12 +16,22 @@ bot = commands.Bot(command_prefix="!", intents=intents)
 cogs_list = [
     "OnJoin",
     "rules",
-    "warning"
+    "warning",
+    "mute",
+    "ban"
 ]
 
 @bot.event
 async def on_ready():
+    stored_buttons = load_appeal_buttons()
+    if stored_buttons:
+        view = AppealPersistentView(bot)
+        for b in stored_buttons:
+            view.add_button(b["case"], b["user_id"], b["case_type"])
+        bot.add_view(view)
+        
     print(f"Bot is now online!")
+
 
 async def main():
     async with bot:
@@ -28,10 +39,5 @@ async def main():
             bot.load_extension(f"cogs.{cog}")
         await bot.start(os.getenv("TOKEN"))
 
+
 asyncio.run(main())
-
-
-
-# MODERATOR_PERMS = mute, view_user
-# MODERATOR_STAGE2_PERMS = kick, view_staffmember
-# ADMINISTRATOR_PERMS = ban, warn_staffmember, kick_staffmember, add_staffmember, rank_staffmember
