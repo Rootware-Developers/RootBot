@@ -6,14 +6,14 @@ from discord.ui import Container, View
 from datetime import datetime
 from .appeals import AppealButton, save_appeal_button
 
-WARN_PERMS = 1353126414869725456  
-LOG_CHANNEL = 1387425316577869994 
-CASES_FILE = "data/cases.json" 
-WARNINGS_FILE = "data/warnings.json"  
-
+WARN_PERMS = 1353126414869725456  # Role ID requiered to use /warn & /unwarn
+LOG_CHANNEL = 1387425316577869994 # Channel to Log warnings / unwarnings
+CASES_FILE = "data/cases.json" # File to save current Case Number
+WARNINGS_FILE = "data/warnings.json" # File to save warnings
 
 
 def get_case():
+    # Increments and returns the current case number
     if not os.path.exists(CASES_FILE):
         with open(CASES_FILE, "w") as f:
             json.dump({"CASE": 0}, f)
@@ -30,8 +30,8 @@ def get_case():
     return NEXT_CASE
 
 
-
 def add_warning(case, user, moderator, reason):
+    # Adds a warning to the warnings-file
     if not os.path.exists(WARNINGS_FILE):
         with open(WARNINGS_FILE, "w") as f:
             json.dump([], f)
@@ -51,8 +51,8 @@ def add_warning(case, user, moderator, reason):
         json.dump(WARNINGS, f, indent=4)
 
 
-
 def remove_warning(CASE):
+    # Removes a warning from the warnings-file
     if not os.path.exists(WARNINGS_FILE):
         return None
 
@@ -70,8 +70,8 @@ def remove_warning(CASE):
 
     with open(WARNINGS_FILE, "w") as f:
         json.dump(UPDATED_WARNINGS, f, indent=4)
-
-    return {"CASE": CASE, "USER_ID": USER_ID}
+        
+    return {"CASE": CASE, "USER_ID": USER_ID} # Returns a Dict with CASE and USER_ID (needed for /unwarn command)
 
 
 
@@ -81,21 +81,23 @@ class Warning(commands.Cog):
 
     @discord.slash_command(name="warn", description="Warn a user")
     async def warn(self, ctx, user: discord.Member, reason: str):
-        LOGS_CONTAINER = Container()
-        USER_CONTAINER = Container()
+        LOGS_CONTAINER = Container() # create UI Container for logs
+        USER_CONTAINER = Container() # create UI Container for user
         MODERATOR = ctx.author
         CASE = get_case()
 
-
+        # Check if user has the required role to warn
         if not any(role.id == WARN_PERMS for role in MODERATOR.roles):
             await ctx.respond("You don't have the permissions to use this command.", ephemeral=True)
             return
         
+        # Save warning to Json File
         add_warning(CASE, user, MODERATOR, reason)
+        # Create Appeal-Button & save to Json File
         APPEAL_BUTTON = AppealButton(CASE, user.id, "warning", self.bot)
         save_appeal_button(CASE, user.id, APPEAL_BUTTON.appealed, "warning")
 
-
+        # Message for User
         USER_CONTAINER.add_text("# <:warning:1397873177283264594>  You got warned ")
         USER_CONTAINER.add_separator()
         USER_CONTAINER.add_text(
@@ -107,6 +109,7 @@ class Warning(commands.Cog):
         USER_CONTAINER.add_item(APPEAL_BUTTON)
         USER_CONTAINER_VIEW = View(USER_CONTAINER, timeout=None)
 
+        # Message for log Channel
         LOGS_CONTAINER.add_text("# <:warning:1397873177283264594>  User got warned ")
         LOGS_CONTAINER.add_separator()
         LOGS_CONTAINER.add_text(
@@ -119,9 +122,8 @@ class Warning(commands.Cog):
         LOGS_CONTAINER.add_text(f"-# {datetime.now().strftime('%b %d, %Y %I:%M %p')}")
         LOG_CONTAINER_VIEW = View(LOGS_CONTAINER, timeout=None)
 
-
+        # send messages
         CHANNEL = self.bot.get_channel(LOG_CHANNEL)
-
         await CHANNEL.send(view=LOG_CONTAINER_VIEW)
         await ctx.respond(view=LOG_CONTAINER_VIEW, ephemeral=True)
         await user.send(view=USER_CONTAINER_VIEW)
@@ -130,15 +132,16 @@ class Warning(commands.Cog):
 
     @discord.slash_command(name="unwarn", description="Remove a warn from a user")
     async def unwarn(self, ctx, case: int, reason: str):
-        LOGS_CONTAINER = Container()
-        USER_CONTAINER = Container()
+        LOGS_CONTAINER = Container() # create UI Container for logs
+        USER_CONTAINER = Container() # create UI Container for user
         MODERATOR = ctx.author
 
-
+        # Check if user has the required role to warn
         if not any(role.id == WARN_PERMS for role in MODERATOR.roles):
             await ctx.respond("You don't have the permissions to use this command.", ephemeral=True)
             return
 
+        # Remove warning from JSON & get data
         DATA = remove_warning(case)
         USER_ID = DATA["USER_ID"]
         CASE = DATA["CASE"]
@@ -146,7 +149,7 @@ class Warning(commands.Cog):
             await ctx.respond("No entry with this case found.", ephemeral=True)
             return
 
-
+        # Message for user
         USER_CONTAINER.add_text("# <:circle_check_mark:1398677122091847731>  You got unwarned ")
         USER_CONTAINER.add_separator()
         USER_CONTAINER.add_text(
@@ -158,6 +161,7 @@ class Warning(commands.Cog):
         USER_CONTAINER.add_text(f"-# {datetime.now().strftime('%b %d, %Y %I:%M %p')}")
         USER_CONTAINER_VIEW = View(USER_CONTAINER, timeout=None)
 
+        # Message for log Channel
         LOGS_CONTAINER.add_text("# <:circle_check_mark:1398677122091847731>  User got unwarned ")
         LOGS_CONTAINER.add_separator()
         LOGS_CONTAINER.add_text(
@@ -170,10 +174,9 @@ class Warning(commands.Cog):
         LOGS_CONTAINER.add_text(f"-# {datetime.now().strftime('%b %d, %Y %I:%M %p')}")
         LOG_CONTAINER_VIEW = View(LOGS_CONTAINER, timeout=None)
 
-
+        # send Messages
         CHANNEL = self.bot.get_channel(LOG_CHANNEL)
         USER = await self.bot.fetch_user(USER_ID)
-
         await CHANNEL.send(view=LOG_CONTAINER_VIEW)
         await ctx.respond(view=LOG_CONTAINER_VIEW, ephemeral=True)
         await USER.send(view=USER_CONTAINER_VIEW)

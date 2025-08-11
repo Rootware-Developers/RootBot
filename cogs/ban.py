@@ -6,17 +6,16 @@ from discord.ext import commands
 from discord.ui import Container, View
 from datetime import datetime
 from datetime import timedelta
+from .appeals import AppealButton, save_appeal_button
+
+BAN_PERMS = 1388449595436044318 # Role ID requiered to use /mute & /umnute
+LOG_CHANNEL = 1387425316577869994 # Channel to log bans / unbans
+CASES_FILE = "data/cases.json" # File to save current Case Number
+BANS_FILE = "data/bans.json" # file to save mutes
 
 
-# ---------- VARIABLES ----------
-BAN_PERMS = 1388449595436044318 # Required role to Ban (ID)
-LOG_CHANNEL = 1387425316577869994 # Channel to log bans
-CASES_FILE = "data/cases.json" # JSON file to save cases
-BANS_FILE = "data/bans.json" # JSON file to save bans
-
-
-# ---------- GET NUMBER OF CASE ----------
 def get_case():
+    # Increments and returns the current case number
     if not os.path.exists(CASES_FILE):
         with open (CASES_FILE, "w") as f:
             json.dump({"CASE": 0}, f)
@@ -33,8 +32,8 @@ def get_case():
     return NEXT_CASE
 
 
-# ---------- ADD BAN TO JSON ----------
 def add_ban(case, user, moderator, reason):
+    # Adds a ban to the bans-file
     if not os.path.exists(BANS_FILE):
         with open (BANS_FILE, "w") as f:
             json.dump([], f)
@@ -54,8 +53,8 @@ def add_ban(case, user, moderator, reason):
         json.dump(BANS, f, indent=4)
 
 
-# ---------- ADD UNBAN TO JSON ----------
 def add_unmute(case, user_id, moderator, reason):
+    # Adds a unban to the bans-file
     if not os.path.exists(BANS_FILE):
         with open(BANS_FILE, "w") as f:
             json.dump([], f)
@@ -76,33 +75,32 @@ def add_unmute(case, user_id, moderator, reason):
 
 
 
-# ---------- COG ----------
 class Ban(commands.Cog):
     def __init__(self, bot):
         self.bot = bot  
         
 
-    # --- BAN COMMAND (/ban) ---
     @discord.slash_command(name="ban", description="Ban a user from the Server")
     async def mute(self, ctx , user: discord.Member, reason: str):
-        # > VARIABLES <
-        LOGS_CONTAINER = Container()
-        USER_CONTAINER = Container()
+        LOGS_CONTAINER = Container() # create UI Container for logs
+        USER_CONTAINER = Container() # create UI Container for user
         MODERATOR = ctx.author
         CASE = get_case()
 
 
-        # > CHECK IF USER HAS BAN PERMISSIONS <
+        # Check if user has the required role to ban
         if not any(role.id == BAN_PERMS for role in MODERATOR.roles):
             await ctx.respond("You don't have the permissions to use this command.", ephemeral=True)
             return
 
-        # > SAVE BAN <
+        # save ban to JSON file
         add_ban(CASE, user, MODERATOR, reason)
+        # Create Appeal-Button & save to Json File
+        APPEAL_BUTTON = AppealButton(CASE, user.id, "ban", self.bot)
+        save_appeal_button(CASE, user.id, APPEAL_BUTTON.appealed, "ban")
 
-
-        # > USER CONTAINER <
-        USER_CONTAINER.add_text("# <:banhammer:1400854673724018769> 〢 You got banned ")
+        # message for user
+        USER_CONTAINER.add_text("# <:banhammer:1404129307219066970>  You got banned ")
         USER_CONTAINER.add_separator()
         USER_CONTAINER.add_text(
             f"> **<:paper:1397984129928265902>Reason:** `{reason}`\n"  
@@ -110,12 +108,11 @@ class Ban(commands.Cog):
             f"> **<:wallet:1397981208763433112>Case:** `#{CASE}`"
         )
         USER_CONTAINER.add_separator()
-        USER_CONTAINER.add_text("-# if you want to appeal your Ban, you need to contact devmatrix0815 (Better System is coming soon)")
+        USER_CONTAINER.add_item(APPEAL_BUTTON)
         USER_VIEW = View(USER_CONTAINER, timeout=None)
         
-
-        # > LOG CONTAINER <
-        LOGS_CONTAINER.add_text("# <:banhammer:1400854673724018769> 〢 User got banned ")
+        # message for log channel
+        LOGS_CONTAINER.add_text("# <:banhammer:1404129307219066970>  User got banned ")
         LOGS_CONTAINER.add_separator()
         LOGS_CONTAINER.add_text(
             f"> **<:person:1397981170431688844>User:** {user.mention}\n" 
@@ -127,10 +124,10 @@ class Ban(commands.Cog):
         LOGS_CONTAINER.add_text(f"-# {datetime.now().strftime('%b %d, %Y %I:%M %p')}")
         LOG_VIEW = View(LOGS_CONTAINER, timeout=None)
 
-        # > BAN THE USER <
+        # ban the user
         await user.ban(reason=reason)
 
-        # > SENT THE CONTAINERS <
+        # send messages
         CHANNEL = self.bot.get_channel(LOG_CHANNEL)
         await CHANNEL.send(view=LOG_VIEW) 
         await ctx.respond(view=LOG_VIEW, ephemeral=True) 
@@ -141,25 +138,23 @@ class Ban(commands.Cog):
     # --- UNBAN COMMAND (/unban) ---
     @discord.slash_command(name="unban", description="Unban a user from the Server")
     async def unban(self, ctx , user_id: str, reason: str):
-        # > VARIABLES <
-        LOGS_CONTAINER = Container()
-        USER_CONTAINER = Container()
-        user = await self.bot.fetch_user(user_id)
+        LOGS_CONTAINER = Container() # create UI Container for logs
+        USER_CONTAINER = Container() # create UI Container for user
+        user = await self.bot.fetch_user(user_id) # fetch user with entered User-ID
         MODERATOR = ctx.author
         CASE = get_case()
 
 
-        # > CHECK IF USER HAS UNBAN PERMISSIONS <
+        # Check if user has the required role to ban
         if not any(role.id == BAN_PERMS for role in MODERATOR.roles):
             await ctx.respond("You don't have the permissions to use this command.", ephemeral=True)
             return
 
-        # > SAVE BAN <
+        # save unban to json
         add_unmute(CASE, user_id, MODERATOR, reason)
 
-
-        # > USER CONTAINER <
-        USER_CONTAINER.add_text("# <:circle_check_mark:1398677122091847731> 〢 You got unbanned ")
+        # message for user
+        USER_CONTAINER.add_text("# <:circle_check_mark:1398677122091847731>  You got unbanned ")
         USER_CONTAINER.add_separator()
         USER_CONTAINER.add_text(
             f"> **<:paper:1397984129928265902>Reason:** `{reason}`\n"  
@@ -167,12 +162,11 @@ class Ban(commands.Cog):
             f"> **<:wallet:1397981208763433112>Case:** `#{CASE}`"
         )
         USER_CONTAINER.add_separator()
-        USER_CONTAINER.add_text(f"-# {datetime.now().strftime('%b %d, %Y %I:%M %p')}")
+        USER_CONTAINER.add_text(f"-# **Rejoin:** https://discord.gg/dSeAXPPBBD")
         USER_VIEW = View(USER_CONTAINER, timeout=None)
         
-
-        # > LOG CONTAINER <
-        LOGS_CONTAINER.add_text("# <:circle_check_mark:1398677122091847731> 〢 User got unbanned ")
+        # message for log channel
+        LOGS_CONTAINER.add_text("# <:circle_check_mark:1398677122091847731>  User got unbanned ")
         LOGS_CONTAINER.add_separator()
         LOGS_CONTAINER.add_text(
             f"> **<:person:1397981170431688844>User:** {user.mention}\n" 
@@ -184,10 +178,10 @@ class Ban(commands.Cog):
         LOGS_CONTAINER.add_text(f"-# {datetime.now().strftime('%b %d, %Y %I:%M %p')}")
         LOG_VIEW = View(LOGS_CONTAINER, timeout=None)
 
-        # > UNBAN THE USER <
+        # unban the user
         await ctx.guild.unban(user)
 
-        # > SENT THE CONTAINERS <
+        # send messages
         CHANNEL = self.bot.get_channel(LOG_CHANNEL)
         await CHANNEL.send(view=LOG_VIEW) 
         await ctx.respond(view=LOG_VIEW, ephemeral=True) 

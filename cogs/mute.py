@@ -8,16 +8,14 @@ from datetime import datetime
 from datetime import timedelta
 from .appeals import AppealButton, save_appeal_button
 
-
-# ---------- VARIABLES ----------
-MUTE_PERMS = 1353126414869725456 # Required role to mute (ID)
-LOG_CHANNEL = 1387425316577869994 # Channel to log mutes
-CASES_FILE = "data/cases.json" # JSON file to save cases
-MUTES_FILE = "data/mutes.json" # JSON file to save mutes
+MUTE_PERMS = 1353126414869725456 # Role ID requiered to use /mute & /umnute
+LOG_CHANNEL = 1387425316577869994 # Channel to log mutes / unmutes
+CASES_FILE = "data/cases.json" # File to save current Case Number
+MUTES_FILE = "data/mutes.json" # file to save mutes
 
 
-# ---------- GET NUMBER OF CASE ----------
 def get_case():
+    # Increments and returns the current case number
     if not os.path.exists(CASES_FILE):
         with open (CASES_FILE, "w") as f:
             json.dump({"CASE": 0}, f)
@@ -34,8 +32,8 @@ def get_case():
     return NEXT_CASE
 
 
-# ---------- ADD MUTE TO JSON ----------
 def add_mute(case, user, moderator, reason, duration):
+    # Adds a mute to the mutes-file
     if not os.path.exists(MUTES_FILE):
         with open (MUTES_FILE, "w") as f:
             json.dump([], f)
@@ -56,8 +54,8 @@ def add_mute(case, user, moderator, reason, duration):
         json.dump(MUTES, f, indent=4)
 
 
-# ---------- ADD UNMUTE TO JSON ----------
 def add_unmute(case, user, moderator, reason):
+    # Adds a unmute to the mutes-file
     if not os.path.exists(MUTES_FILE):
         with open (MUTES_FILE, "w") as f:
             json.dump([], f)
@@ -78,32 +76,28 @@ def add_unmute(case, user, moderator, reason):
 
 
 
-# ---------- COG ----------
 class Mute(commands.Cog):
     def __init__(self, bot):
         self.bot = bot  
         
 
-    # --- MUTE COMMAND (/mute) ---
     @discord.slash_command(name="mute", description="Timeout a user")
     async def mute(self, ctx , user: discord.Member, reason: str, duration: str):
-        # > VARIABLES <
-        LOGS_CONTAINER = Container()
-        USER_CONTAINER = Container()
+        LOGS_CONTAINER = Container() # create UI Container for logs
+        USER_CONTAINER = Container() # create UI Container for user
         MODERATOR = ctx.author
         CASE = get_case()
 
 
-        # > CHECK IF USER HAS MUTE PERMISSIONS <
+        # Check if user has the required role to mute
         if not any(role.id == MUTE_PERMS for role in MODERATOR.roles):
             await ctx.respond("You don't have the permissions to use this command.", ephemeral=True)
             return
         
 
-        # > FETCH DURATION <
+        # Fetch Duration of mute
         PATTERN = re.compile(r"(?:(\d+)d)?\s*(?:(\d+)h)?\s*(?:(\d+)m)?", re.IGNORECASE)
         MATCH = PATTERN.fullmatch(duration.strip())
-
         if not MATCH:
             await ctx.respond("**Please use a valid format:** m, h, d", ephemeral=True)
             return
@@ -118,13 +112,13 @@ class Mute(commands.Cog):
             return
         
 
-        # > SAVE MUTE <
+        # Save mute to Json File
         add_mute(CASE, user, MODERATOR, reason, duration)
+        # Create Appeal-Button & save to Json File
         APPEAL_BUTTON = AppealButton(CASE, user.id, "mute", self.bot)
         save_appeal_button(CASE, user.id, APPEAL_BUTTON.appealed, "mute")
 
-
-        # > USER CONTAINER <
+        # Message for user
         USER_CONTAINER.add_text("# <:mute:1398921067762024449>  You got muted ")
         USER_CONTAINER.add_separator()
         USER_CONTAINER.add_text(
@@ -137,8 +131,7 @@ class Mute(commands.Cog):
         USER_CONTAINER.add_item(APPEAL_BUTTON)
         USER_VIEW = View(USER_CONTAINER, timeout=None)
         
-
-        # > LOG CONTAINER <
+        # Message for log Channel
         LOGS_CONTAINER.add_text("# <:mute:1398921067762024449>  User got muted ")
         LOGS_CONTAINER.add_separator()
         LOGS_CONTAINER.add_text(
@@ -152,37 +145,33 @@ class Mute(commands.Cog):
         LOGS_CONTAINER.add_text(f"-# {datetime.now().strftime('%b %d, %Y %I:%M %p')}")
         LOG_VIEW = View(LOGS_CONTAINER, timeout=None)
 
-        # > MUTE THE USER <
+        # mute suer
         await user.timeout_for(DURATION, reason=reason)
 
-        # > SENT THE CONTAINERS <
+        # send messages
         CHANNEL = self.bot.get_channel(LOG_CHANNEL)
         await CHANNEL.send(view=LOG_VIEW) 
         await ctx.respond(view=LOG_VIEW, ephemeral=True) 
         await user.send(view=USER_VIEW) 
 
 
-
-    # --- UNMUTE COMMAND (/unmute) ---
     @discord.slash_command(name="unmute", description="Remove a timeout from a user")
     async def unmute(self, ctx , user: discord.Member, reason: str):
-        # > VARIABLES <
-        LOGS_CONTAINER = Container()
-        USER_CONTAINER = Container()
+        LOGS_CONTAINER = Container() # create UI Container for logs
+        USER_CONTAINER = Container() # create UI Container for user
         MODERATOR = ctx.author
         CASE = get_case()
 
 
-        # > CHECK IF USER HAS UNMUTE PERMISSIONS <
+        # Check if user has the required role to mute
         if not any(role.id == MUTE_PERMS for role in MODERATOR.roles):
             await ctx.respond("You don't have the permissions to use this command.", ephemeral=True)
             return
 
-        # > SAVE UNMUTE <
+        # save unmute to Json
         add_unmute(CASE, user, MODERATOR, reason)
 
-
-        # > USER CONTAINER <
+        # message for user
         USER_CONTAINER.add_text("# <:circle_check_mark:1398677122091847731>  You got unmuted ")
         USER_CONTAINER.add_separator()
         USER_CONTAINER.add_text(
@@ -194,8 +183,7 @@ class Mute(commands.Cog):
         USER_CONTAINER.add_text(f"-# {datetime.now().strftime('%b %d, %Y %I:%M %p')}")
         USER_VIEW = View(USER_CONTAINER, timeout=None)
         
-
-        # > LOG CONTAINER <
+        # message for log Channel
         LOGS_CONTAINER.add_text("# <:circle_check_mark:1398677122091847731>  User got unmuted ")
         LOGS_CONTAINER.add_separator()
         LOGS_CONTAINER.add_text(
@@ -208,10 +196,10 @@ class Mute(commands.Cog):
         LOGS_CONTAINER.add_text(f"-# {datetime.now().strftime('%b %d, %Y %I:%M %p')}")
         LOG_VIEW = View(LOGS_CONTAINER, timeout=None)
 
-        # > UNMUTE THE USER <
+        # unmute the user
         await user.timeout(None, reason=reason)
 
-        # > SENT THE CONTAINERS <
+        # send messages
         CHANNEL = self.bot.get_channel(LOG_CHANNEL)
         await CHANNEL.send(view=LOG_VIEW) 
         await ctx.respond(view=LOG_VIEW, ephemeral=True) 

@@ -1,8 +1,6 @@
 import discord
 from discord.ext import commands
-
-PERMS_ROLES=[1323620437262991410, 1323619918771388506]
-
+PERMS_ROLES=[1323620437262991410, 1323619918771388506] # Roles authorized to execute the !rules command
 
 
 class Rules(commands.Cog):
@@ -12,10 +10,11 @@ class Rules(commands.Cog):
     @commands.command()
     async def rules(self, ctx):
         user = ctx.author
-        
+        # Check if user has at least one required Role
         if not any(role.id in PERMS_ROLES for role in user.roles):
             return
         
+        # Embed with every rule
         rules = discord.Embed(
             title="Server rules",
             description="Please read and follow these rules to keep our community safe and enjoyable. Breaking the rules may result in warnings, timeouts or bans.",
@@ -33,10 +32,10 @@ class Rules(commands.Cog):
         rules.add_field(name="**10. Support is voluntary:**", value="Don’t spam if you don’t get an answer right away. Be patient and polite.", inline=False)
         rules.add_field(name="**11. Code & questions:**", value="Use code blocks (```) for longer code. Ask clear and well-formulated questions.", inline=False)
         rules.add_field(name="**12. Discord-rules:**", value="Always follow the Discord [Terms of Service](https://discord.com/terms) and [Community Guidelines](https://discord.com/guidelines).", inline=False)
-
         rules.set_footer(text="Last Update: July 15, 2025")
+
+        # send Embed
         await ctx.send(embed=rules)
-    
 
 
 def setup(bot):
