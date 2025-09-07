@@ -11,7 +11,7 @@ BUTTONS_FILE = "data/appeal_buttons.json" # File to save Appeal-Buttons persiste
 
 class AppealReviewModal(Modal):
     # Modal for Moderators to accept / deny Appeals
-    # Will be showed if a Moderator clicks on "Accept" / "Deny"
+    # Will be shown if a Moderator clicks on "Accept" / "Deny"
     def __init__(self, case: int, user: discord.User, accepted: bool, case_type: str, bot, view: 'AppealReviewView'):
         super().__init__(title=f"Response to Appeal for Case #{case}")
         self.case_id = case
@@ -37,13 +37,15 @@ class AppealReviewModal(Modal):
             # Depending on the case type, execute the appropriate “un” function
             if self.case_type ==  "warning":
                 ctx = await self.bot.get_application_context(interaction)
-                cog = self.bot.get_cog("Warning")
+                cog = self.bot.get_cog("Moderation")
                 if cog:
-                    await cog.unwarn(ctx, case=self.case_id, reason=f"{REASON}")
+                    guild = interaction.guild
+                    member = guild.get_member(self.user.id) or await guild.fetch_member(self.user.id)
+                    await cog.unwarn(ctx, user=member, case=self.case_id, reason=f"{REASON}")
 
             if self.case_type == "mute":
                 ctx = await self.bot.get_application_context(interaction)
-                cog = self.bot.get_cog("Mute")
+                cog = self.bot.get_cog("Moderation")
                 if cog:
                     guild = interaction.guild
                     member = guild.get_member(self.user.id) or await guild.fetch_member(self.user.id) # to unmute a User, needed from Discord
@@ -51,7 +53,7 @@ class AppealReviewModal(Modal):
 
             if self.case_type == "ban":
                 ctx = await self.bot.get_application_context(interaction)
-                cog = self.bot.get_cog("Ban")
+                cog = self.bot.get_cog("Moderation")
                 if cog:
                     await cog.unban(ctx, user_id=self.user.id, reason=f"{REASON}")
 
@@ -79,8 +81,8 @@ class AppealReviewModal(Modal):
 
 
 class AppealReviewView(View):
-   # Button-View for Moderators to accept / deny appeal
-   # Will be Shown in Embed (AppealModal class) 
+   # View with buttons for moderators to accept / deny appeal
+   # Will be shown in Embed (AppealModal class) 
     def __init__(self, case_id: int, user: discord.User, embed: discord.Embed, case_type: str, bot):
         super().__init__(timeout=None)
         self.case_id = case_id
@@ -125,10 +127,10 @@ class AppealModal(Modal):
         save_appeal_button(self.case_id, self.user.id, True, case_type=self.case_type)
 
         await interaction.response.send_message(
-            f"Your appeal for Case #{self.case_id} has been submitted.",
+            f"Your appeal for Case #{self.case_id} was successfully submitted.",
             ephemeral=True
         )
-        # Embed been showed to Moderators with needed Appeal-Informations 
+        # Embed is shown to Moderators with needed Appeal Informations
         embed = discord.Embed(
             title=f"Appeal Submitted - Case #{self.case_id}",
             description=f"> **<:person:1397981170431688844>User:** {self.user.mention}\n> **<:paper:1397984129928265902>Reason:** `{APPEAL_TEXT}`",
@@ -144,8 +146,8 @@ class AppealModal(Modal):
 
 
 class AppealButton(Button):
-    # Button to submit a Appeal 
-    # Shown in Warning / Mute / Ban Container
+    # Button to submit an Appeal 
+    # shown in Warning / Mute / Ban Container
     def __init__(self, case: int, user_id: int, case_type: str, bot):
         super().__init__(label="Appeal Case", style=discord.ButtonStyle.secondary, custom_id=f"appeal_button:{case}:{user_id}")
         self.case = case
@@ -158,7 +160,7 @@ class AppealButton(Button):
         user = await self.bot.fetch_user(self.user_id)
 
         if self.appealed:
-            await interaction.response.send_message("You have already appealed for this case.", ephemeral=True)
+            await interaction.response.send_message("You have already submitted an appeal for this case", ephemeral=True)
             return
             
         modal = AppealModal(case=self.case, user=user, case_type=self.case_type, bot=self.bot, appeal_button=self)
@@ -167,7 +169,7 @@ class AppealButton(Button):
 
 
 def save_appeal_button(case: int, user_id: int, appealed: bool, case_type: str):
-    # Saves the Appeal Button Persistent in a Json File
+    # Saves the Appeal Button persistently in a Json File
     if not os.path.exists(BUTTONS_FILE):
         with open(BUTTONS_FILE, "w") as f:
             json.dump([], f)
@@ -181,7 +183,7 @@ def save_appeal_button(case: int, user_id: int, appealed: bool, case_type: str):
 
 
 def load_appeal_buttons():
-    # Loads the Appeal-Button from Json File
+    # Loads the appeal button from JSON File
     if not os.path.exists(BUTTONS_FILE):
         return []
     
@@ -191,7 +193,7 @@ def load_appeal_buttons():
 
 
 class AppealPersistentView(View):
-    # View to add Appeal-Buttons after restart
+    # View to add appeal buttons after restart
     def __init__(self, bot):
         super().__init__(timeout=None)
         self.bot = bot

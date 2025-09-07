@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
-PERMS_ROLES=[1323620437262991410, 1323619918771388506] # Roles authorized to execute the !rules command
+
+PERMS_ROLES=[1323625301024047169] # Roles authorized to execute the !rules command
 
 
 class Rules(commands.Cog):
@@ -16,23 +17,23 @@ class Rules(commands.Cog):
         
         # Embed with every rule
         rules = discord.Embed(
-            title="Server rules",
-            description="Please read and follow these rules to keep our community safe and enjoyable. Breaking the rules may result in warnings, timeouts or bans.",
+            title="wServer rules",
+            description="Please read and follow these rules to ensure a safe and welcoming community. Violations may result in warnings, timeouts, or bans.",
             color=discord.Color.green()
         )
-        rules.add_field(name="**1. Be respectful and helpful:**", value="Hate, harassment, or toxic behavior will not be tolerated.", inline=False)
-        rules.add_field(name="**2. Only English:**", value="Only English is allowed in all channels.", inline=False)
-        rules.add_field(name="**3.  Avoid politics or religious topics:**", value="This server is only for tech, coding, and development!", inline=False)
-        rules.add_field(name="**4. No NSFW, extreme, or violent content:**", value="Memes are allowed, but use common sense and keep it appropriate.", inline=False)
-        rules.add_field(name="**5. Self-promotion:**", value="Self-promotion is allowed only in the designated projects channel. No advertising via DMs.", inline=False)
-        rules.add_field(name="**6. bots & tools:**", value="No custom bots or automated tools without permission.", inline=False)
-        rules.add_field(name="**7. Stay on topic:**", value="Use the correct channels for your topics.", inline=False)
-        rules.add_field(name="**8. Voice-chat rules:**", value="No yelling, no soundboards, and always stay respectful.")
-        rules.add_field(name="**9. Chat behavior:**", value="No spam, trolling, or low-effort messages. Focus on valuable discussions.", inline=False)
-        rules.add_field(name="**10. Support is voluntary:**", value="Don’t spam if you don’t get an answer right away. Be patient and polite.", inline=False)
-        rules.add_field(name="**11. Code & questions:**", value="Use code blocks (```) for longer code. Ask clear and well-formulated questions.", inline=False)
-        rules.add_field(name="**12. Discord-rules:**", value="Always follow the Discord [Terms of Service](https://discord.com/terms) and [Community Guidelines](https://discord.com/guidelines).", inline=False)
-        rules.set_footer(text="Last Update: July 15, 2025")
+        rules.add_field(name="**1️⃣  Be respectful and helpful:**", value="> Treat everyone respectfully and be helpful. Hate, harassment, or toxic behavior will not be tolerated.", inline=False)
+        rules.add_field(name="**2️⃣  Only English:**", value="> Communicate in English only in all channels to ensure everyone can participate.", inline=False)
+        rules.add_field(name="**3️⃣  Avoid politics or religious topics:**", value="> Avoid political or religious discussions. This server focuses on tech, coding, and development.", inline=False)
+        rules.add_field(name="**4️⃣  No NSFW, extreme, or violent content:**", value="> No NSFW, extreme, or violent content. Memes are allowed but must remain appropriate.", inline=False)
+        rules.add_field(name="**5️⃣  Self-promotion:**", value="> Self-promotion is only allowed in the designated projects channel. Advertising via DMs is prohibited.", inline=False)
+        rules.add_field(name="**6️⃣  bots & tools:**", value="> No custom bots or automated tools may be used without prior permission.", inline=False)
+        rules.add_field(name="**7️⃣  Stay on topic:**", value="> Keep discussions relevant. Use the appropriate channels for your topics.", inline=False)
+        rules.add_field(name="**8️⃣  Voice-chat rules:**", value="> In voice channels, do not yell or use soundboards. Always remain respectful")
+        rules.add_field(name="**9️⃣  Chat behavior:**", value="> Avoid spamming, trolling, or low-effort messages. Contribute to meaningful discussions.", inline=False)
+        rules.add_field(name="**🔟  Support is voluntary:**", value="> Support is voluntary. Be patient and polite if you don’t receive an immediate response", inline=False)
+        rules.add_field(name="**💡  Code & questions:**", value="> Use code blocks (```) for longer snippets. Ask clear, well-formulated questions.", inline=False)
+        rules.add_field(name="**📜  Discord-rules:**", value="> Always follow Discord's [Terms of Service](https://discord.com/terms) and [Community Guidelines](https://discord.com/guidelines).", inline=False)
+        rules.set_footer(text="Last Update: September 6, 2025")
 
         # send Embed
         await ctx.send(embed=rules)
