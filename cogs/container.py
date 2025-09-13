@@ -103,7 +103,7 @@ def create_user_container(TYPE, MODTYPE, REASON, MODERATOR, CASE, DURATION, APPE
 
     # Check type & modtype and add the correct footer content
     if (MODTYPE == "remove"):
-        if (TYPE == "WARNING" or "MUTE"):
+        if (TYPE == "WARNING") or (TYPE == "MUTE"):
             CONTAINER.add_text(f"-# {datetime.now().strftime('%b %d, %Y %I:%M %p')}") # Date and Time
         elif (TYPE == "BAN"):
             CONTAINER.add_text("-# **Rejoin:** https://discord.gg/dSeAXPPBBD") # Link to Rejoin

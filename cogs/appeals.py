@@ -60,14 +60,14 @@ class AppealReviewModal(Modal):
             # Set embed visually to "accepted"
             self.view.embed.color = discord.Color.green()
             self.view.embed.set_footer(text="Status: Accepted")
-            self.view.embed.description += f"\n > **<:moderator:1397981211640598719>Claimed by: {MODERATOR.mention}**\n> `{REASON}`"
+            self.view.embed.description += f"\n **<:moderator:1397981211640598719>Claimed by: {MODERATOR.mention}**\n ```{REASON}```"
             await self.view.message.edit(embed=self.view.embed, view=None)
 
         else:
             # Inform users about denied appeal
             embed = discord.Embed(
-                title=f"Your appeal for Case #{self.case_id} has been denied",
-                description=f"`{REASON}`",
+                title=f"Your appeal for Case `#{self.case_id}` has been denied",
+                description=f"```{REASON}```",
                 color=discord.Colour.red()
             )
             await self.user.send(embed=embed)
@@ -75,7 +75,8 @@ class AppealReviewModal(Modal):
             # Set embed visually to "denied"
             self.view.embed.color = discord.Color.red()
             self.view.embed.set_footer(text="Status: Denied")
-            self.view.embed.description += f"\n > **<:moderator:1397981211640598719>Claimed by: {MODERATOR.mention}**\n> `{REASON}`"
+            self.view.embed.description += f"\n **<:moderator:1397981211640598719>Claimed by: {MODERATOR.mention}**\n ```{REASON}```"
+            await interaction.response.send_message(f"Denied appeal for Case #{self.case_id}.", ephemeral=True )
             await self.view.message.edit(embed=self.view.embed, view=None)
 
 
@@ -133,7 +134,7 @@ class AppealModal(Modal):
         # Embed is shown to Moderators with needed Appeal Informations
         embed = discord.Embed(
             title=f"Appeal Submitted - Case #{self.case_id}",
-            description=f"> **<:person:1397981170431688844>User:** {self.user.mention}\n> **<:paper:1397984129928265902>Reason:** `{APPEAL_TEXT}`",
+            description=f"**<:person:1397981170431688844>User: {self.user.mention}**\n ```{APPEAL_TEXT}```",
             color=discord.Colour.light_grey()
         )
         embed.set_footer(text="Status: Pending")

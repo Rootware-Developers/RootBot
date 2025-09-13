@@ -28,21 +28,21 @@ def save_moderation_json(SAVE_TYPE, TYPE, CASE, USER, MODERATOR, REASON, DURATIO
         DATA = json.load(f)
 
     # Save data to JSON & check the save type (add/remove) and append it to the JSON data
-    DATA.append({
+    entry = {
         "TYPE": "add" if SAVE_TYPE == "ADD" else "remove",
         "CASE": CASE,
         "USER_ID": USER.id,
         "MODERATOR_ID": MODERATOR.id,
         "REASON": REASON,
-        "TIMESTAMP": datetime.now().isoformat()
-    })
+        "TIMESTAMP": datetime.now().isoformat() 
+    }
 
 
     # If the type is "MUTE", also save the duration
-    if (TYPE == "MUTE"):
-        DATA.append({
-            "DURATION": DURATION,
-        })
+    if (TYPE == "MUTE" and SAVE_TYPE == "ADD"):
+        entry["DURATION"] = str(DURATION)
+
+    DATA.append(entry)
     
     # Add all changes to the JSON file
     with open(FILE, "w") as f:

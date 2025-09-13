@@ -58,7 +58,7 @@ class Moderation(commands.Cog):
         # Save case to JSON & create LOGS -and USER Containers 
         save_moderation_json("REMOVE", "WARNING", case, user, MODERATOR, reason, None)
         LOGS_CONTAINER = create_logs_container("WARNING", "remove", user, reason, MODERATOR, case, None)
-        USER_CONTAINER = create_user_container("WARNING", "remove", reason, MODERATOR, case, None)
+        USER_CONTAINER = create_user_container("WARNING", "remove", reason, MODERATOR, case, None, None)
 
         # Send Messages
         CHANNEL = self.bot.get_channel(LOG_CHANNEL)
@@ -131,7 +131,7 @@ class Moderation(commands.Cog):
         # Save case to JSON & create LOGS -and USER Containers 
         save_moderation_json("REMOVE", "MUTE", CASE, user, MODERATOR, reason, None)
         LOGS_CONTAINER = create_logs_container("MUTE", "remove", user, reason, MODERATOR, CASE, None)
-        USER_CONTAINER = create_user_container("MUTE", "remove", reason, MODERATOR, CASE, None)
+        USER_CONTAINER = create_user_container("MUTE", "remove", reason, MODERATOR, CASE, None, None)
 
         # Unmute the user
         await user.timeout(None, reason=reason)
@@ -189,7 +189,7 @@ class Moderation(commands.Cog):
         # Save case to JSON & create LOGS -and USER Containers 
         save_moderation_json("REMOVE", "BAN", CASE, user, MODERATOR, reason, None)
         LOGS_CONTAINER = create_logs_container("BAN", "remove", user, reason, MODERATOR, CASE, None)
-        USER_CONTAINER = create_user_container("BAN", "remove", reason, MODERATOR, CASE, None)
+        USER_CONTAINER = create_user_container("BAN", "remove", reason, MODERATOR, CASE, None, None)
 
         # Unban the user
         await ctx.guild.unban(user)
